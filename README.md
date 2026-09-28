@@ -43,182 +43,190 @@ the reading line. Both branches are therefore generated and verified for every q
 --feedback-ratio r` keeps only a share r of the events' labels (sparse feedback). The lead-worker team
 (`agent_team`) uses a different protocol, described in `docs/experiments/agent_team.md`.
 
-## Setup
+## Environment Setup
+
+```bash
+conda create -n bare-mem python=3.12
+conda activate bare-mem
+pip install -r requirements_qwen3.txt
+pytest tests/unit          # optional, CPU only: the record, the rules and the configs
+```
+
+vLLM must be exactly 0.8.5: the attention tilt patches its attention kernels. `run.sh` activates the `bare-mem`
+environment (set `BAREMEM_ENV` to use another name).
+
+## 📝 Model Preparation
+
+Download the central models:
 
 ```bash
 cd BaRe-Mem
-conda create -n bare-mem python=3.12 && conda activate bare-mem
-pip install -r requirements_qwen3.txt          # torch 2.6.0 (CUDA 12.4), transformers 4.56.2, vLLM 0.8.5 (exact)
-python datasets/download.py                    # the released datasets -> data/ (see datasets/README.md)
-pytest tests/unit                              # CPU only: the rules, the record, the configs and job expansion
-python -m pipeline.registry                    # lists every registered dataset, model, peer and task and checks every reference
+mkdir -p models
+
+hf download Qwen/Qwen3-4B --local-dir models/Qwen3-4B
+hf download Qwen/Qwen3-8B --local-dir models/Qwen3-8B
+hf download Qwen/Qwen3-14B --local-dir models/Qwen3-14B
+hf download Qwen/Qwen2.5-7B-Instruct --local-dir models/Qwen2.5-7B-Instruct
+hf download meta-llama/Llama-3.1-8B-Instruct --local-dir models/Meta-Llama-3.1-8B-Instruct
+hf download mistralai/Ministral-8B-Instruct-2410 --local-dir models/Ministral-8B-Instruct-2410
+hf download microsoft/phi-4 --local-dir models/phi-4
 ```
 
-vLLM must be exactly 0.8.5: the tilt's attention kernels are patched from its source. Set `paths.models_root` in
-`configs/base.yaml` to the directory holding the models (one sub-directory each, named as `path:` in `configs/models/`):
-the central models, and, to generate new peer answers, the six peers:
-
-| slot | peer | registered as |
-|---|---|---|
-| `peer_0` | `google/gemma-3-4b-it` | `gemma3_4b` |
-| `peer_1` | `microsoft/Phi-4-mini-instruct` | `phi4_mini` |
-| `peer_2` | `Qwen/Qwen2.5-Coder-7B-Instruct` | `qwen25_coder_7b` |
-| `peer_3` | `meta-llama/Llama-3.1-8B-Instruct` | `llama31` |
-| `peer_4` | `deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct` | `deepseek_coder_v2_lite` |
-| `peer_5` | `deepseek-ai/DeepSeek-R1-Distill-Qwen-7B` | `r1_distill_qwen_7b` |
-
-Central models: `q3_4b` (Qwen3-4B), `qwen3_8b`, `qwen3_14b`, `qwen25` (Qwen2.5-7B-Instruct), `llama31`, `ministral`
-(Ministral-8B-Instruct-2410), `phi4`; thinking is off for the Qwen3 models (`configs/models/`). Code answers are graded
-by executing them (a subprocess with limits, not a sandbox): use a disposable machine.
-
-## Data
-
-| dataset | events | content |
-|---|---:|---|
-| `address_fit`: `data/address_fit/stream.jsonl` | 17,709 | GSM8K, SQuAD, APPS questions (the benchmarks' train splits); used label-free, only to fit the record's address PCA |
-| `capability_supported`: `data/capability_supported/test.jsonl` | 4,319 | GSM8K test, SQuAD dev, APPS test |
-| `capability_challenging`: `data/capability_challenging/test.jsonl` | 17,403 | PIQA, MMLU, OpenBookQA, SciQ, BBH, SuperGLUE |
-| `capability_supported_misleading`, `capability_challenging_misleading` | | every peer's verified misleading answer to every event |
-| `capability_supported_misleading_p000` … `_p100`, `capability_challenging_misleading_p000` … `_p100` (group `misleading_rates`) | | the streams with 0, 25, 50, 75, 100% of every peer's answers misleading |
-
-Each event carries the question, the gold answer, the six peers' answers and their verified correctness. The MuSiQue
-sub-task stream of the agent-team experiment is built from the benchmark's own file by `pipeline.team build`.
-
-## Running experiments
-
-Every experiment is a YAML file, run by one command:
+The released datasets already contain the six peers' answers. The peer models are needed only to generate new
+answers: the workers' reports in the agent-team experiment, or a new misleading regime. Llama-3.1-8B-Instruct, above, is
+also a peer.
 
 ```bash
-bash run.sh configs/experiments/main.yaml --dry-run     # the jobs, and which are already done
-bash run.sh configs/experiments/main.yaml --smoke       # 48 events, every step, into outputs/smoke/ (run this first)
-bash run.sh configs/experiments/main.yaml               # the whole experiment; resumable, finished work is skipped
-bash run.sh configs/experiments/main.yaml --steps evaluate --set evaluation.max_new_tokens=1024
+hf download google/gemma-3-4b-it --local-dir models/gemma-3-4b-it
+hf download microsoft/Phi-4-mini-instruct --local-dir models/Phi-4-mini-instruct
+hf download Qwen/Qwen2.5-Coder-7B-Instruct --local-dir models/Qwen2.5-Coder-7B-Instruct
+hf download deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct --local-dir models/DeepSeek-Coder-V2-Lite-Instruct
+hf download deepseek-ai/DeepSeek-R1-Distill-Qwen-7B --local-dir models/DeepSeek-R1-Distill-Qwen-7B
 ```
 
-| experiment | question | guide |
-|---|---|---|
-| `main` | the frozen Qwen3-4B with its record on the capability-supported and capability-challenging streams (the reference rows) | [docs/experiments/main.md](docs/experiments/main.md) |
-| `families` | the record for other central models (Llama-3.1-8B, Ministral-8B, Qwen2.5-7B, phi-4), each with its own record | [docs/experiments/families.md](docs/experiments/families.md) |
-| `misleading` | peers that are misleading on purpose, at any misleading information ratio | [docs/experiments/misleading.md](docs/experiments/misleading.md) |
-| `misleading_families` | the same misleading datasets for Llama-3.1-8B, Ministral-8B, Qwen2.5-7B, phi-4 and Qwen3-14B | [docs/experiments/misleading_families.md](docs/experiments/misleading_families.md) |
-| `combination` | BaRe-Mem: per question, Advisors + memory or No consultation, chosen by the reading line (ρ, δ); 0–100% misleading | [docs/experiments/combination.md](docs/experiments/combination.md) |
-| `combination_families` | BaRe-Mem for Llama-3.1-8B, Ministral-8B, Qwen2.5-7B, phi-4 and Qwen3-14B, each its own judge | [docs/experiments/combination_families.md](docs/experiments/combination_families.md) |
-| `baselines` | multi-agent baselines on the same streams: Majority vote (advisors; advisors + own answer) and multi-agent debate (1 and 2 rounds; Debate + vote) | [docs/experiments/baselines.md](docs/experiments/baselines.md) |
-| `baselines_families` | the baselines for Qwen3-8B, Qwen3-14B, Llama-3.1-8B, Ministral-8B, phi-4 and Qwen2.5-7B, each its own judge | [docs/experiments/baselines_families.md](docs/experiments/baselines_families.md) |
-| `agent_team` | the record inside a lead-worker team on MuSiQue: the lead gives every sub-task to one source, in the order the record gives from the sub-task alone; no check, the lead's own check, or the dataset's check before the commit; against success counts and a random order | [docs/experiments/agent_team.md](docs/experiments/agent_team.md) |
-| `agent_team_qwen3_8b`, `agent_team_qwen3_14b`, `agent_team_qwen25`, `agent_team_llama31`, `agent_team_ministral`, `agent_team_phi4` | the same team with another lead: its own answers, its check of the reports and its record; the workers' reports are reused | [docs/experiments/agent_team.md](docs/experiments/agent_team.md) |
+Llama-3.1-8B-Instruct and gemma-3-4b-it are gated: accept their licences on Hugging Face and run `hf auth login`
+first. The resulting directory layout is:
 
-### The analyses
+```text
+models/
+├── Qwen3-4B/
+├── Qwen3-8B/
+├── Qwen3-14B/
+├── Qwen2.5-7B-Instruct/
+├── Meta-Llama-3.1-8B-Instruct/
+├── Ministral-8B-Instruct-2410/
+├── phi-4/
+├── gemma-3-4b-it/
+├── Phi-4-mini-instruct/
+├── Qwen2.5-Coder-7B-Instruct/
+├── DeepSeek-Coder-V2-Lite-Instruct/
+└── DeepSeek-R1-Distill-Qwen-7B/
+```
+
+The configs load these paths directly (`configs/models/`, under `paths.models_root` in `configs/base.yaml`). Set
+`gpus` in `configs/base.yaml` to the GPUs the runner may use.
+
+## 📦 Data Preparation
+
+Download the evaluation datasets into `data/`:
 
 ```bash
-MODELS_ROOT=models bash analysis/sparse_feedback.sh                # how little verified feedback the record needs (pipeline.record --feedback-ratio)
-PYTHONPATH=. python analysis/bare_analysis.py > bare_analysis.json # the own-ability estimate against the model alone, predicted against observed gain, sparse feedback
-PYTHONPATH=. python -m analysis.check_vllm_tilt --help            # the vLLM tilt kernel against the HF attention reference
-PYTHONPATH=. python -m analysis.check_kalman_numerics --help      # the record's covariance over a whole stream: symmetric, positive definite
-PYTHONPATH=. python -m analysis.family_prompt_check --help        # CPU: the tilt covers the peer blocks under a model's chat template
+python datasets/download.py
 ```
 
-`bare_analysis.py` reads the outputs of the `combination` experiments and of `sparse_feedback.sh`.
+The files come from [Sssunset/BaRe-Mem-Data](https://huggingface.co/datasets/Sssunset/BaRe-Mem-Data); each is checked
+against its sha256 in `datasets/manifest.json` before it is unpacked. `--only <dataset> ...` downloads a subset.
 
-### The stages
+### Dataset Card
 
-| stage | entry point | does |
-|---|---|---|
-| questions | `pipeline/team.py build` | a benchmark's own sub-tasks as a stream with one view per tool (`built: musique`: MuSiQue's hops, teacher-forced) |
-| peers | `pipeline/peers.py` | a peer model answers every event of a stream, honestly or with verified misleading answers |
-| streams | `pipeline/streams.py` | a derived stream: peers added, or answers replaced under a regime |
-| own | `pipeline/evaluate.py` + `pipeline/streams.py add` | the central model's no-consultation answer joins the stream as one more answer |
-| direct | `pipeline/evaluate.py` (No consultation) | the team baseline: the lead answers every whole task directly, alone |
-| verify | `pipeline/review.py` | the lead's check of every report of a team's stream: does it meet what the lead expected of it? |
-| features | `pipeline/features.py` | the frozen judge reads question + answers; its hidden states address the record |
-| record | `pipeline/record.py` | the Bayesian record along the stream, read before write, and its quality |
-| evaluate | `pipeline/evaluate.py` | the central model answers each event under a condition; answers graded |
-| vote | `pipeline/vote.py` | majority votes over the peers' answers, with or without the central model's answer |
-| combination | `pipeline/combination.py` | per event, Advisors + memory or No consultation, chosen by the reading line |
-| team | `pipeline/team.py replay` | the lead's choice of source per sub-task (`feedback_state/agent_team.py`) replayed along a stream |
-| table | `pipeline/table.py` | the experiment's result table |
+Every event holds a question, its gold answer, the six peers' answers and their verified correctness.
 
-Each entry point is a plain command with explicit paths (`python -m pipeline.<stage> --help`); `pipeline/run.py` derives
-the paths from the config and schedules the jobs (the devices are `gpus:` in `configs/base.yaml`).
+| Dataset | Events | Description |
+| --- | ---: | --- |
+| `capability_supported` | 4,319 | Capability-supported stream: GSM8K test, SQuAD dev and APPS test |
+| `capability_challenging` | 17,403 | Capability-challenging stream: PIQA, MMLU, OpenBookQA, SciQ, BBH and SuperGLUE |
+| `<stream>_misleading_p000` … `_p100` | 4,319 / 17,403 | The stream with 0, 25, 50, 75 or 100% of every peer's answers misleading |
+| `<stream>_misleading` | 25,914 / 104,418 | Answer pools: every peer's verified misleading answer to every event |
 
-### Registering datasets, models, peers and tasks
+After downloading, the files read by the configs are:
 
-Datasets, models, peers and task types are registered one YAML file each, and experiments refer to them by file name, so
-adding one is adding a file (`python -m pipeline.registry` lists everything and checks every reference):
-
-```
-configs/datasets/<name>.yaml   kind stream: {path, peers: [peer names, in peer_0 ... order]}; kind answers: {base, mode};
-                               kind misleading: {base, answers, regime};
-                               or a group: {group: [names]}. `include: _misleading.yaml` pulls in a template.
-configs/models/<name>.yaml     {hf_id, path (under paths.models_root), engine, env_vars, prefix_caching, ...}
-configs/peers/<name>.yaml      {model: a registered model, reasoning, tool, ...}: one peer; a new peer is a new file. `tool:` names
-                               the view of the stream the peer answers from (a stream's `views:`, e.g. what a searcher retrieves)
-configs/tasks/<name>.yaml      {grader, agreement, context, instruction, max_tokens}: one task type. `grader:` names a grading rule
-                               in feedback_state/tasks.py (GRADERS); the rest is what is not code: the central model's instruction,
-                               the peers' answer budget, whether the passage is shown, when two answers agree in a vote. A new task
-                               over an existing rule is a new file; a new rule is one function plus its file
+```text
+data/
+  capability_supported/test.jsonl
+  capability_challenging/test.jsonl
+  capability_{supported,challenging}_misleading_p{000,025,050,075,100}/test.jsonl
+  capability_{supported,challenging}_misleading/<peer>/shard0of1.jsonl
 ```
 
-For example a new regime, two peers that always lie, is `configs/datasets/capability_supported_saboteurs.yaml`:
+The agent-team stream is built by the pipeline from MuSiQue, whose dev file is fetched from Hugging Face
+(`dgslibisey/MuSiQue`) when missing.
 
-```yaml
-include: _misleading.yaml
-base: capability_supported
-regime: {kind: fraction, rate: 1.0, peers: [1, 4]}
+## 🚀 Evaluation
+
+Every experiment is one YAML file in `configs/experiments/` and runs with one command. Runs are resumable: running a
+command again skips the work already finished.
+
+```bash
+bash run.sh configs/experiments/main.yaml --dry-run    # the jobs, and which are already done
+bash run.sh configs/experiments/main.yaml --smoke      # 48 events through every step, into outputs/smoke/
+bash run.sh configs/experiments/main.yaml              # the whole experiment
 ```
 
-and `--set "datasets=[capability_supported_saboteurs]"` runs it (the streams step builds it from the answers already generated).
+Each experiment writes its result table to `outputs/tables/<experiment>.md`, and every model, dataset and condition
+its answers and metrics to `outputs/eval/<model>/<dataset>/<condition>/` (`generations.jsonl`, `eval_metrics.json`).
+Code answers are graded by executing them in a subprocess with limits, not a sandbox: use a disposable machine.
+`docs/experiments/` has a guide for each experiment.
 
-### Adding an experiment
+### Advisors + memory
 
-Copy the closest file in `configs/experiments/` and change what differs. What a file can set:
+Qwen3-4B on the two streams under No consultation, Question + Peers and Advisors + memory, plus `swap`, a control that
+permutes the record's ranking:
 
-- `steps`: any of questions, peers, streams, own, direct, verify, features, record, evaluate, vote, combination, team, table.
-- `central`: the models that answer (registered names).
-- `datasets`: registered datasets or groups. The steps follow from their kinds: `peers` generates the answers datasets
-  the named misleading datasets need, `streams` builds those, and features, record and evaluate run on each.
-- `eval_conditions` (conditions are defined once under `conditions:`; a new setting, e.g. another γ, gets a new name,
-  because results are stored by condition name). A condition with `mode: debate` answers after `round` debate rounds and
-  reads its `previous` condition's answers; `vote_conditions` (`mode: vote`, optional `own`) are majority votes, step `vote`.
-- `record`: design, dim, lam, order, fit (a dataset name, or `self`).
-- `team`: dim, orders, checker, calls, dataset_check, direct (the lead's choice of source and the verification before the commit).
-- `own_answer: true`: the central model's no-consultation answer joins every stream as one more answer, recorded like the
-  peers' but kept out of the prompt (step `own`); `combination` then picks Advisors + memory or No consultation per event.
-- `table`: rows (`models` or `regimes`), `reference` models, `deltas`, and `columns` (every column, in order).
-
-A result is reused only if it was produced with the same settings: an evaluation stores its full condition, and the
-runner stops with a clear message instead of silently reusing a result made with other settings.
-
-### Where results go
-
-```
-data/<dataset>/                                          registered datasets: downloaded, generated answers (<peer>/), built streams
-outputs/features/<model>/<stream>/                       the judge's features
-outputs/record/<model>/<stream>/<order>.fit-<fit>.jsonl  the record (+ .quality.json)
-outputs/eval/<model>/<stream>/<condition>/               generations.jsonl + eval_metrics.json
-<stream>+own                                             with own_answer: the features, record and evaluations of that stream
-                                                         plus the central model's own answer (No consultation stays on <stream>)
-outputs/tables/<experiment>.md                           result tables
-outputs/runs/<experiment>/                               the resolved config and every command
-logs/<experiment>/<job>.log
+```bash
+bash run.sh configs/experiments/main.yaml
 ```
 
-Experiments share this layout, so a result computed once (the main experiment's rows) is read by every other experiment
-that needs it.
+### Misleading advisors
 
-## Repository layout
+The same three conditions when 0, 25, 50, 75 or 100% of the peers' answers are misleading:
 
+```bash
+bash run.sh configs/experiments/misleading.yaml
 ```
-run.sh               the one command
-configs/             base.yaml (paths, defaults, conditions), datasets/, models/, peers/, tasks/ (the registries), experiments/
-pipeline/            the stages, the runner (run.py), config loading, the registry and the output layout
-feedback_state/      the method: kalman_memory.py (the record), addresses.py, memory_runtime.py, reading_line.py (consult or
-                     answer alone), attn_bias.py + vllm_attn_bias.py (the tilt), judge_prompt.py, judge_features.py,
-                     memory_generator.py (prompts, grading), tasks.py, adversarial.py (misleading answers and regimes),
-                     baselines.py (debate), answer_groups.py (votes), agent_team.py (the lead-worker loop)
-analysis/            the analyses above and the implementation checks
-data/builders/       code grading (executing programs against their tests)
-datasets/            download.py and the manifest of the released files
-docs/experiments/    one guide per experiment
-tests/unit/          CPU tests
+
+### BaRe-Mem
+
+Per question, BaRe-Mem takes Advisors + memory or No consultation, as the reading line decides; Qwen3-4B and Qwen3-8B
+at every misleading ratio:
+
+```bash
+bash run.sh configs/experiments/combination.yaml
 ```
+
+### Multi-agent baselines
+
+Majority vote (advisors), Majority vote (advisors + own), Debate (1 and 2 rounds) and Debate + vote on the same
+datasets. It reads the results of `combination`, so run that first:
+
+```bash
+bash run.sh configs/experiments/baselines.yaml
+```
+
+### Other central models
+
+The experiments above for Qwen3-8B, Qwen3-14B, Qwen2.5-7B, Llama-3.1-8B, Ministral-8B and phi-4. Each command runs
+every model in its config; `--set central=[qwen25]` runs one of them:
+
+```bash
+bash run.sh configs/experiments/families.yaml
+bash run.sh configs/experiments/misleading_families.yaml
+bash run.sh configs/experiments/combination_families.yaml
+bash run.sh configs/experiments/baselines_families.yaml
+```
+
+### Agent team
+
+A lead-worker team on MuSiQue: the lead gives each sub-task to one source in the order its record gives, with no check,
+the lead's own check or the dataset's check before the commit. The workers are the six peers; the other leads reuse
+their reports:
+
+```bash
+bash run.sh configs/experiments/agent_team.yaml                   # lead: Qwen3-4B
+for lead in qwen3_8b qwen3_14b qwen25 llama31 ministral phi4; do
+  bash run.sh configs/experiments/agent_team_$lead.yaml
+done
+```
+
+### Sparse feedback
+
+How much verified feedback the record needs, for Qwen3-4B and Qwen3-8B. It reads the results of `combination`:
+
+```bash
+MODELS_ROOT=models bash analysis/sparse_feedback.sh
+PYTHONPATH=. python analysis/bare_analysis.py > bare_analysis.json    # summary of combination and sparse feedback
+```
+
+### Extending
+
+Datasets, models, peers and task types are registered one YAML file each, and experiments refer to them by name.
+[docs/pipeline.md](docs/pipeline.md) describes the stages, the registries, the experiment options and the output layout.
