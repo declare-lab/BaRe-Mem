@@ -1,0 +1,6 @@
+# A task type. Yes/no questions (capability-challenging stream): right when the extracted yes/no matches the gold label.
+grader: boolqa                      # the rule that extracts and verifies an answer (feedback_state/tasks.py, GRADERS)
+agreement: canonical                # when two answers are the same answer in a vote (feedback_state/answer_groups.py)
+instruction: "Decide. End with a line of the form 'Final answer: <yes or no>'."
+max_tokens: 96                    # a peer's answer budget
+misleading_max_tokens: 256         # a misleading answer argues for its conclusion

@@ -1,0 +1,6 @@
+# Every peer of capability_supported answering every event with a verified misleading answer (pipeline.peers --mode misleading).
+# One directory per peer under paths.data/capability_supported_misleading/; the capability_supported_misleading_pNNN streams pick from these answers.
+kind: answers
+base: capability_supported
+mode: misleading
+release: answers/capability_supported_misleading.jsonl.gz

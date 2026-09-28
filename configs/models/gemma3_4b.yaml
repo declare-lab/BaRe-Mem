@@ -1,0 +1,4 @@
+# peer_0 of the released streams.
+hf_id: google/gemma-3-4b-it
+path: gemma-3-4b-it
+engine: vllm

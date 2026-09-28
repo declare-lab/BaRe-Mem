@@ -1,0 +1,5 @@
+# The workers' reports on every sub-task of musique_hops_q (pipeline.peers --mode honest), one directory per worker, each
+# answering from its tool's view.
+kind: answers
+base: musique_hops_q
+mode: honest

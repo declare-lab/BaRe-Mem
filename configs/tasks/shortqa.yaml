@@ -1,0 +1,6 @@
+# A task type. Short answers (capability-challenging stream): right by the frozen canonicalisation of short answers of the answer.
+grader: shortqa                     # the rule that extracts and verifies an answer (feedback_state/tasks.py, GRADERS)
+agreement: canonical                # when two answers are the same answer in a vote (feedback_state/answer_groups.py)
+instruction: "Answer briefly. End with a line of the form 'Final answer: <answer>'."
+max_tokens: 96                    # a peer's answer budget
+misleading_max_tokens: 256         # a misleading answer argues for its conclusion

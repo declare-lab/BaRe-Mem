@@ -1,0 +1,4 @@
+# A central model of the families experiment, and peer_3 of the released streams.
+hf_id: meta-llama/Llama-3.1-8B-Instruct
+path: Meta-Llama-3.1-8B-Instruct
+engine: vllm

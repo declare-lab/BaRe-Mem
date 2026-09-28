@@ -1,0 +1,4 @@
+# peer_2 of the released streams.
+hf_id: Qwen/Qwen2.5-Coder-7B-Instruct
+path: Qwen2.5-Coder-7B-Instruct
+engine: vllm

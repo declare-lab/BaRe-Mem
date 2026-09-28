@@ -1,0 +1,21 @@
+# Multi-agent baselines against BaRe-Mem (docs/experiments/baselines.md): on the same misleading streams, with the same
+# central model and the same six peer answers, how do majority vote and multi-agent debate compare with Advisors + memory,
+# Question + Peers, No consultation and BaRe-Mem? It reads the `combination` experiment's results for the central model
+# (its record, no-consultation answers, Advisors + memory, BaRe-Mem); only the debate rounds use GPUs.
+base: combination.yaml
+name: baselines
+steps: [evaluate, vote, table]
+central: [q3_4b]
+eval_conditions: [debate1, debate2]                 # the central model's answer after one and two debate rounds
+vote_conditions: [vote_peers, vote_all, debate_vote]
+conditions:
+  debate1:     {mode: debate, round: 1, previous: solo, label: Debate (1 round)}       # multi-agent debate; the peers' answers stay fixed
+  debate2:     {mode: debate, round: 2, previous: debate1, label: Debate (2 rounds)}
+  vote_peers:  {mode: vote, label: Majority vote (advisors)}                              # the six peers
+  vote_all:    {mode: vote, own: solo, label: Majority vote (advisors + own)}             # and the central model's no-consultation answer
+  debate_vote: {mode: vote, own: debate2, label: Debate + vote}                        # and its answer after two debate rounds
+evaluation: {vllm_shards: 2}
+
+table:
+  rows: regimes
+  columns: [solo, peers, vote_peers, vote_all, debate1, debate2, debate_vote, tilt, combination]

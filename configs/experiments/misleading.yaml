@@ -1,0 +1,17 @@
+# Robustness: the six peers answer with misleading but relevant solutions (docs/experiments/misleading.md).
+# Every peer answers every event misleadingly once (peers -> the <stream>_misleading datasets); each misleading dataset's
+# regime then chooses which of those answers enter its stream (streams). A new regime is a new file in configs/datasets/.
+base: ../base.yaml
+name: misleading
+steps: [peers, streams, features, record, evaluate, table]
+central: [q3_4b]
+datasets: [misleading_rates]                 # registered in configs/datasets/: 0-100% misleading, capability_supported and capability_challenging
+record: {fit: self}                          # addresses fit on each misleading stream itself (label-free)
+eval_conditions: [tilt, peers, solo]         # Advisors + memory, Question + Peers, No consultation (read from the base stream: no peers in it)
+
+table:
+  rows: regimes
+  reference: [q3_4b]                         # the honest rows (main experiment)
+  misleading_probe: true
+
+smoke: {datasets: [capability_supported_misleading_p050]}

@@ -1,0 +1,6 @@
+# The capability-challenging stream: yes/no, multiple-choice and short-answer tasks (PIQA, MMLU, OpenBookQA, SciQ, BBH, SuperGLUE), six peers.
+label: Capability-challenging            # the stream's name in result tables
+path: capability_challenging/test.jsonl
+peers: [gemma3_4b, phi4_mini, qwen25_coder_7b, llama31, deepseek_coder_v2_lite, r1_distill_qwen_7b]   # peer_0 ... peer_5 (configs/peers/)
+events: 17403
+release: data/capability_challenging.jsonl.gz

@@ -1,0 +1,10 @@
+# The whole MuSiQue questions, for the baseline "the lead answers the task directly" (docs/experiments/agent_team.md): one `subqa`
+# event per question, no decomposition, with the question's own 20 paragraphs ranked by BM25 for the question (the prompt keeps the
+# first 8,000 characters), graded on the final answer. Written by the same build as musique_hops_q (`pipeline.team build`).
+path: musique_hops_q/tasks.jsonl
+peers: []                           # nobody reports on it: the lead answers it alone
+solo_only: true
+events: 2417
+task: subqa
+built: musique
+source: musique_src/musique_ans_v1.0_dev.jsonl

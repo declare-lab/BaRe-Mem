@@ -1,0 +1,7 @@
+# peer_4 of the released streams.
+hf_id: deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct
+path: DeepSeek-Coder-V2-Lite-Instruct
+engine: vllm
+env_vars: {VLLM_USE_V1: 0}          # its MLA attention has no working chunked-prefill path in vLLM 0.8.5 V1
+prefix_caching: false               # vLLM 0.8.5 V0 prefix caching corrupts MLA attention: with it on, about 30% of answers are
+                                    # unrelated text or symbol runs (honest prompts included); off, none (2026-09-13)

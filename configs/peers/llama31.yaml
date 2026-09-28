@@ -1,0 +1,2 @@
+# A peer: meta-llama/Llama-3.1-8B-Instruct answering the streams' questions (pipeline.peers).
+model: llama31                      # a registered model (configs/models/)

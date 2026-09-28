@@ -1,0 +1,14 @@
+outputs/*
+/models/
+data/*
+!data/__init__.py
+!data/builders/
+!data/builders/**
+logs/
+# Python caches
+__pycache__/
+*.pyc
+.pytest_cache/
+.ray/
+*.egg-info/
+

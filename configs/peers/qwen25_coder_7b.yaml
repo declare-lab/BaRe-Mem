@@ -1,0 +1,2 @@
+# A peer: Qwen/Qwen2.5-Coder-7B-Instruct answering the streams' questions (pipeline.peers).
+model: qwen25_coder_7b              # a registered model (configs/models/)

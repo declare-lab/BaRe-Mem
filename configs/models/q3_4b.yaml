@@ -1,0 +1,4 @@
+# The central model of the main and misleading experiments.
+hf_id: Qwen/Qwen3-4B
+path: Qwen3-4B                      # under paths.models_root (or an absolute path)
+engine: vllm

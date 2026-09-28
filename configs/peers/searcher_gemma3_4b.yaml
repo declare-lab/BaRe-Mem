@@ -1,0 +1,3 @@
+# A worker of the research team (pipeline.team): google/gemma-3-4b-it answering sub-questions, closed-book: no retrieval, its own knowledge.
+model: gemma3_4b                    # a registered model (configs/models/)
+tool: closed_book                   # the view of the stream it answers from (the stream's `views`)

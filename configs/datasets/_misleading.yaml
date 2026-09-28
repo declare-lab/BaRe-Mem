@@ -1,0 +1,11 @@
+# Template of a misleading stream: `include: _misleading.yaml`, then base (a stream) and regime.
+# The stream is {base} with some answers replaced by the peers' misleading answers ({base}_misleading), built by the
+# streams step into paths.data/{name}/. regime:
+#   pNNN   that share of every peer's answers, a different set of events per peer, nested across rates (p000 = honest)
+#   kN     exactly N misleading peers on every event
+#   a mapping, e.g. {kind: fraction, rate: 1.0, peers: [1, 4]} (two saboteurs), {kind: flip, at: 0.5, peers: [1, 4]}
+#   (honest for the first half of the record's order), {kind: targeted, rate: 1.0} (misleading exactly where right)
+kind: misleading
+answers: "{base}_misleading"
+order: shuffled0                          # the order the record walks the stream (flip depends on it)
+release: "data/{name}.jsonl.gz"            # released in full on the Hugging Face Hub

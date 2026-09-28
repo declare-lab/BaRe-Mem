@@ -1,0 +1,8 @@
+# The lead-worker team with Qwen3-14B as the lead (docs/experiments/agent_team.md): the same pool of workers and the same sub-tasks
+# (their reports are generated once and shared); the lead's own answers, its check of every report and the record's addresses are
+# Qwen3-14B's.
+base: agent_team.yaml
+name: agent_team_qwen3_14b
+central: [qwen3_14b]
+team:
+  checker: qwen3_14b                 # the model behind the lead's check: the lead's own

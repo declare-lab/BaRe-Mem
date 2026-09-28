@@ -1,0 +1,3 @@
+# A worker of the research team (pipeline.team): microsoft/Phi-4-mini-instruct answering sub-questions, BM25 top-3 over the question's own paragraphs.
+model: phi4_mini                    # a registered model (configs/models/)
+tool: local3                        # the view of the stream it answers from (the stream's `views`)

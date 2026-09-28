@@ -1,0 +1,23 @@
+# The record inside a lead-worker team (docs/experiments/agent_team.md). The lead (Qwen3-4B) hands each sub-task to ONE source of
+# its pool (a worker, or itself: autonomy; its own answer is the last source), in the order the record gives from the sub-task
+# alone. The lead checks the report against what it expected of it (a plain, specific answer of the right kind; no evidence, not
+# the record); a report that does not meet it sends the sub-task to the next source in that order, two at most. After the commit
+# the benchmark's gold answer labels every report that was produced, and those labels are written into the record; nothing is
+# written for a source that was not called. `team` replays that along the stream against an order by success counts and a random
+# order; every source's report is generated and checked once offline, so that every order is replayed on the same events.
+base: ../base.yaml
+name: agent_team
+steps: [questions, peers, streams, own, direct, verify, features, team]
+central: [q3_4b]
+datasets: [musique_team]
+own_answer: true                    # the lead's own answer joins the sources: the autonomous option
+record: {fit: self}                 # the addresses' PCA is fit on the stream's own features (label-free)
+team:
+  checker: q3_4b                    # the model behind the lead's check of a report (a registered model): the lead's own
+  calls: 2                          # the sources a sub-task may go to at most, when a report fails its verification
+  direct: musique_tasks             # the baseline without a team: the lead answers every whole task directly, alone
+  dataset_check: true               # the second illustration: the benchmark's evaluator (the gold answer) verifies before the commit
+  dim: 64                           # of the sub-task's address; the record sees one to two verdicts per sub-task, far fewer rows than in the QA streams
+  orders: [0, 1, 2]                 # stream orders (tasks shuffled, a task's sub-tasks together); results are their mean
+
+smoke: {events: 48, dim: 8}         # 16 tasks end to end, under outputs/smoke/

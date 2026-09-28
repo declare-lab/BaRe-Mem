@@ -1,0 +1,4 @@
+# A central model of the families experiment.
+hf_id: Qwen/Qwen2.5-7B-Instruct
+path: Qwen2.5-7B-Instruct
+engine: vllm

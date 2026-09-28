@@ -1,0 +1,3 @@
+# A worker of the research team (pipeline.team): Qwen/Qwen2.5-Coder-7B-Instruct answering sub-questions, BM25 top-1 over the question's own paragraphs.
+model: qwen25_coder_7b              # a registered model (configs/models/)
+tool: local1                        # the view of the stream it answers from (the stream's `views`)

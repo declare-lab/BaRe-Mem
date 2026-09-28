@@ -1,0 +1,5 @@
+# A task type. Programs (APPS): right when the program passes the hidden tests (graded once, offline; the label is stored with the answer).
+grader: code                        # the rule that extracts and verifies an answer (feedback_state/tasks.py, GRADERS)
+agreement: none                     # when two answers are the same answer in a vote (feedback_state/answer_groups.py)
+instruction: "Write a complete Python program that reads from standard input and writes the answer to standard output (use input()/sys.stdin and print()). Return the program inside a single ```python code block."
+max_tokens: 768                    # a peer's answer budget

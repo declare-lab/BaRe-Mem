@@ -1,0 +1,6 @@
+# The capability-supported stream: GSM8K test, SQuAD dev and APPS test (with the hidden tests), six peers.
+label: Capability-supported              # the stream's name in result tables
+path: capability_supported/test.jsonl
+peers: [gemma3_4b, phi4_mini, qwen25_coder_7b, llama31, deepseek_coder_v2_lite, r1_distill_qwen_7b]   # peer_0 ... peer_5 (configs/peers/)
+events: 4319
+release: data/capability_supported.jsonl.gz

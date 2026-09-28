@@ -1,0 +1,4 @@
+# A central model of the misleading-families experiment (thinking off, like Qwen3-4B).
+hf_id: Qwen/Qwen3-14B
+path: Qwen3-14B
+engine: vllm

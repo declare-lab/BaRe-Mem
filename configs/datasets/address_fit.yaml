@@ -1,0 +1,6 @@
+# The address-fit stream: GSM8K, SQuAD and APPS questions (from the benchmarks' train splits) with six peers. It is used
+# label-free, only to fit the record's address PCA (record.fit in configs/base.yaml); no model is trained on it.
+path: address_fit/stream.jsonl            # under paths.data (python datasets/download.py fills it)
+peers: [gemma3_4b, phi4_mini, qwen25_coder_7b, llama31, deepseek_coder_v2_lite, r1_distill_qwen_7b]   # peer_0 ... peer_5 (configs/peers/)
+events: 17709
+release: data/address_fit.jsonl.gz        # file in the dataset release (datasets/manifest.json)

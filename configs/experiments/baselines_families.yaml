@@ -1,0 +1,15 @@
+# Multi-agent baselines for other central models (docs/experiments/baselines_families.md): the baselines experiment for six
+# more central models, each its own judge with its own features, record and answers. One command per model runs whatever
+# is missing, in order: the `combination` pipeline (its no-consultation answers, features, record, Advisors + memory, question
+# + Peers, BaRe-Mem) and the baselines (two debate rounds, two majority votes). Finished work is skipped, so a model
+# whose combination already ran only adds the baselines.
+base: baselines.yaml
+name: baselines_families
+steps: [own, features, record, evaluate, vote, combination, table]
+central: [qwen3_8b, qwen3_14b, llama31, ministral, phi4, qwen25]
+eval_conditions: [tilt, peers, debate1, debate2]     # debate1 is run because debate2 continues it; it is not in the table
+vote_conditions: [vote_peers, vote_all]
+
+table:
+  rows: regimes
+  columns: [combination, tilt, peers, debate2, vote_all, vote_peers, solo]

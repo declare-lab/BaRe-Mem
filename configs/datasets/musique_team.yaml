@@ -1,0 +1,11 @@
+# The research team's stream (docs/experiments/agent_team.md): musique_hops_q's sub-tasks with every worker's report, labelled by
+# the `subqa` rule against the hop's gold answer. Every worker reports on every sub-task offline so that any assignment policy
+# can be replayed exactly (pipeline.team replay); a policy sees, and the record is written with, only the reports it called.
+path: musique_team/test.jsonl
+peers: [searcher_gemma3_4b, searcher_phi4_mini, searcher_qwen25_coder_7b, searcher_llama31, searcher_deepseek_coder_v2_lite, searcher_r1_distill_qwen_7b]   # peer_0 ... peer_5
+events: 6404
+task: subqa
+by_task: true
+built: answers                  # pipeline.streams add: the base's sub-tasks with the workers' reports
+base: musique_hops_q
+answers: musique_hops_answers

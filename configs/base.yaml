@@ -1,0 +1,46 @@
+# Shared settings for every experiment. An experiment file names `base: ../base.yaml` and overrides what it needs.
+# Run one with:  bash run.sh configs/experiments/<name>.yaml [--steps ...] [--gpus ...] [--smoke] [--dry-run] [--set key=value]
+# Datasets, models and peers are registered one file each in configs/datasets/, configs/models/, configs/peers/
+# (python -m pipeline.registry lists them); experiments name them.
+
+paths:
+  models_root: models                      # the directory holding the downloaded models (one sub-directory each; set it to yours)
+  data: data                               # datasets: python datasets/download.py fills it; the pipeline adds built ones
+  outputs: outputs
+  logs: logs
+
+gpus: [0, 1, 2, 3, 4, 5, 6, 7]             # the GPUs the runner schedules jobs on
+
+# --- stage defaults ----------------------------------------------------------------------------------------------------
+generation:                                # pipeline.peers
+  max_model_len: 8192
+  gpu_memory_utilization: 0.85
+  grade_workers: 8
+  misleading: {max_attempts: 3, temperatures: "0.2,0.7,1.0", force: true}
+
+features:                                  # pipeline.features (the frozen judge = the evaluated model)
+  max_length: 8192
+  dtype: bfloat16
+
+record:                                    # pipeline.record
+  design: qc                               # address = [PCA(question part) | PCA(peer answer part) | 1]
+  dim: 256                                 # PCA components per part
+  lam: 100.0                               # prior precision
+  order: shuffled0                         # the stream order: numpy default_rng(0).permutation
+  fit: address_fit                              # where the PCA addresses are fit (label-free); "self" = each stream on its own
+
+evaluation:                                # pipeline.evaluate
+  engine: vllm
+  max_new_tokens: 768
+  gpu_memory_utilization: 0.85
+  bias_form: logratio
+
+conditions:                                # how the central model answers; a new setting needs a new name (results are stored by name)
+  tilt:  {mode: peers, gamma: 3.0, label: Advisors + memory}   # the six answers in the prompt, attention tilted by the record
+  peers: {mode: peers, label: Question + Peers}                # the same prompt, no tilt
+  solo:  {mode: solo, label: No consultation}                  # the question alone
+  swap:  {mode: peers, gamma: 3.0, swap: true, label: swap}    # the tilt with the record permuted by rank (control)
+
+smoke:                                     # --smoke: a few events of one stream, every step, into outputs/smoke/
+  events: 48
+  dim: 32                                  # the PCA cannot have more components than fit events

@@ -1,0 +1,12 @@
+# Other central-model families, each with its own record (the model is its own frozen judge), against the Qwen3-4B rows.
+base: ../base.yaml
+name: families
+steps: [features, record, evaluate, table]
+central: [llama31, ministral, qwen25, phi4]
+datasets: [capability_challenging, capability_supported]
+eval_conditions: [tilt, peers, solo]
+evaluation: {gpu_memory_utilization: 0.85}
+table:
+  rows: models
+  reference: [q3_4b]                         # rows read from the main experiment's results
+  deltas: [[tilt, peers], [peers, solo]]

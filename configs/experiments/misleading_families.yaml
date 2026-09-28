@@ -1,0 +1,14 @@
+# Robustness of other central models to misleading peers (docs/experiments/misleading_families.md): each model answers the
+# misleading datasets with its own record (it is its own frozen judge), exactly as Qwen3-4B does in misleading.yaml.
+# The misleading answers and datasets are released data (python datasets/download.py): nothing is generated here.
+base: misleading.yaml
+name: misleading_families
+steps: [features, record, evaluate, table]
+central: [llama31, ministral, qwen25, phi4, qwen3_14b]
+datasets: [misleading_rates]
+eval_conditions: [tilt, peers, solo]                   # Advisors + memory, Question + Peers, No consultation
+table:
+  rows: regimes
+  reference: []
+  misleading_probe: true
+smoke: {datasets: [capability_supported_misleading_p050], use_released_data: true}   # 48 events of the released dataset

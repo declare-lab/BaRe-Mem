@@ -1,0 +1,10 @@
+# A task type. A sub-question a lead agent hands to a worker (a hop of a multi-hop question, pipeline.team): the worker's report
+# is right when its token-F1 against the gold answer is at least 0.5, or when it is short (at most 20 words) and contains the
+# gold answer: a report is a sentence, and the lead needs the entity in it.
+grader: subqa                       # the rule that extracts and verifies an answer (feedback_state/tasks.py, GRADERS)
+agreement: qa                       # when two answers are the same answer in a vote (feedback_state/answer_groups.py)
+context: true                       # the event's passages (what the reader's own tool retrieved) are shown with the question
+instruction: "Answer the question using the evidence. End with a line of the form 'Final answer: <short answer>'."
+max_tokens: 256                    # a worker's report budget
+# The lead's own check of a worker's report before the commit (pipeline.review): it sees the sub-task and the report, no evidence.
+lead_check: "You are the lead agent of a team and gave a worker the sub-task below. You expect a report that states plainly one specific answer of the kind the sub-task asks for (a name, a place, a date, a number, ...). Check whether the worker's report meets that expectation. REJECT only if it does not: it gives no answer, says the information is missing or unknown, answers a different question, or gives the wrong kind of thing. If it states a specific answer of the right kind, ACCEPT, even though you cannot confirm it. Reply in exactly two lines:\nCritique: <one sentence>\nVerdict: ACCEPT or REJECT"

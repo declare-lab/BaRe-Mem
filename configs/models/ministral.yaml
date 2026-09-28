@@ -1,0 +1,4 @@
+# A central model of the families experiment.
+hf_id: mistralai/Ministral-8B-Instruct-2410
+path: Ministral-8B-Instruct-2410
+engine: vllm

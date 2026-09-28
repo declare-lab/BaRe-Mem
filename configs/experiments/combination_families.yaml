@@ -1,0 +1,8 @@
+# BaRe-Mem for other central models (docs/experiments/combination_families.md): exactly combination.yaml, run for five
+# more central models. Each model answers the questions alone, is its own frozen judge (its features address its record),
+# reads the six peers with and without its record's tilt, and BaRe-Mem picks Advisors + memory or No consultation per
+# question. The misleading datasets are released data (python datasets/download.py): nothing is generated for the peers.
+base: combination.yaml
+name: combination_families
+central: [llama31, ministral, qwen25, phi4, qwen3_14b]
+smoke: {datasets: [capability_supported_misleading_p050], use_released_data: true}   # 48 questions of the released dataset

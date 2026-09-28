@@ -1,0 +1,3 @@
+# The misleading-information-ratio sweep: capability-supported and capability-challenging, 0% to 100% of every peer's answers misleading.
+group: [capability_supported_misleading_p000, capability_supported_misleading_p025, capability_supported_misleading_p050, capability_supported_misleading_p075, capability_supported_misleading_p100,
+        capability_challenging_misleading_p000, capability_challenging_misleading_p025, capability_challenging_misleading_p050, capability_challenging_misleading_p075, capability_challenging_misleading_p100]

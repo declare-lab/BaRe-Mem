@@ -1,0 +1,5 @@
+# A task type. Math word problems (GSM8K): right when the final number equals the gold answer (math_equal).
+grader: math                        # the rule that extracts and verifies an answer (feedback_state/tasks.py, GRADERS)
+agreement: math                     # when two answers are the same answer in a vote (feedback_state/answer_groups.py)
+instruction: "Solve the problem. Reason briefly, then end with a line of the form 'Final answer: <number>'."
+max_tokens: 512                    # a peer's answer budget

@@ -1,0 +1,20 @@
+# BaRe-Mem: per event the central model's final answer is Advisors + memory or No consultation (docs/experiments/combination.md).
+# Every model answers first: the six peers and the central model alone (its no-consultation answer), and one record
+# estimates the seven answers alike. Advisors + memory reads the six peers with the tilt from that record; the central
+# model's reading line (rho, delta), fit along the stream read before write, then chooses per event which of the two
+# answers is final. The misleading information ratios show whether that keeps accuracy up as the peers turn misleading.
+base: ../base.yaml
+name: combination
+steps: [own, features, record, evaluate, combination, table]
+central: [q3_4b, qwen3_8b]                  # each with its own features (it is the judge), record and answers
+datasets: [misleading_rates]                 # 0-100% misleading, capability_supported and capability_challenging (configs/datasets/)
+own_answer: true                             # the central model's no-consultation answer joins every stream as its last answer
+record: {fit: self}                          # addresses fit on each stream itself (label-free)
+eval_conditions: [tilt, peers, solo]         # Advisors + memory; Question + Peers; No consultation
+combination: {peers_memory: tilt, prior: [0.5, 0.0], lam: 1.0}   # the condition that competes with No consultation; (rho, delta) before any event
+
+table:
+  rows: regimes
+  extra_columns: [combination]
+
+smoke: {datasets: [capability_supported_misleading_p050], use_released_data: true}

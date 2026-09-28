@@ -1,0 +1,8 @@
+# The lead-worker team with phi-4 (14B) as the lead (docs/experiments/agent_team.md): the same pool of workers and the same sub-tasks
+# (their reports are generated once and shared); the lead's own answers, its check of every report and the record's addresses are
+# phi-4 (14B)'s.
+base: agent_team.yaml
+name: agent_team_phi4
+central: [phi4]
+team:
+  checker: phi4                 # the model behind the lead's check: the lead's own

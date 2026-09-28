@@ -1,0 +1,4 @@
+# A worker of the research team (pipeline.team): deepseek-ai/DeepSeek-R1-Distill-Qwen-7B answering sub-questions, BM25 top-3 over every paragraph of the split (an open index).
+model: r1_distill_qwen_7b           # a registered model (configs/models/)
+tool: global3                       # the view of the stream it answers from (the stream's `views`)
+reasoning: true                     # thinks first: 4,096 new tokens, graded on the answer after </think>

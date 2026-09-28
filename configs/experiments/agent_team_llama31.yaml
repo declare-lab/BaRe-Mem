@@ -1,0 +1,8 @@
+# The lead-worker team with Llama-3.1-8B as the lead (docs/experiments/agent_team.md): the same pool of workers and the same sub-tasks
+# (their reports are generated once and shared); the lead's own answers, its check of every report and the record's addresses are
+# Llama-3.1-8B's.
+base: agent_team.yaml
+name: agent_team_llama31
+central: [llama31]
+team:
+  checker: llama31                 # the model behind the lead's check: the lead's own

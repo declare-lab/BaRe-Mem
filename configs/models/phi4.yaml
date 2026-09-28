@@ -1,0 +1,4 @@
+# A central model of the families experiment.
+hf_id: microsoft/phi-4
+path: phi-4
+engine: vllm

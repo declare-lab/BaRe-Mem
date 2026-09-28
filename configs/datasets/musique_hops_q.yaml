@@ -1,0 +1,17 @@
+# A research team's sub-tasks (docs/experiments/agent_team.md): MuSiQue's dev questions, one `subqa`
+# event per hop of every question's own decomposition, teacher-forced (every reference to an earlier hop filled with its gold
+# answer), a question's hops together and in order. Built by `pipeline.team build` from the benchmark's file; the stream itself is
+# the lead's view (its own tool: BM25 top-3 over the question's 20 paragraphs), and each worker answers from the view its `tool:`
+# names. No answers yet: the workers below report on it (musique_hops_answers).
+path: musique_hops_q/test.jsonl
+peers: [searcher_gemma3_4b, searcher_phi4_mini, searcher_qwen25_coder_7b, searcher_llama31, searcher_deepseek_coder_v2_lite, searcher_r1_distill_qwen_7b]   # peer_0 ... peer_5, each a model with a tool
+events: 6404
+task: subqa
+built: musique
+by_task: true                       # events are <task>/h<k>: a task is solved when every sub-task is
+source: musique_src/musique_ans_v1.0_dev.jsonl      # under paths.data; fetched from Hugging Face (dgslibisey/MuSiQue) when missing
+views:                              # what each tool retrieves, as files of the same events beside the stream
+  closed_book: {path: test.jsonl, context: false}
+  local3: test.jsonl
+  local1: agents/local1.jsonl
+  global3: agents/global3.jsonl

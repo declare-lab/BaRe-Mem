@@ -1,0 +1,4 @@
+# peer_5 of the released streams.
+hf_id: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
+path: DeepSeek-R1-Distill-Qwen-7B
+engine: vllm

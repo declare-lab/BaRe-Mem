@@ -1,0 +1,3 @@
+# A peer: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B answering the streams' questions (pipeline.peers).
+model: r1_distill_qwen_7b           # a registered model (configs/models/)
+reasoning: true                     # thinks first: 4,096 new tokens, graded on the answer after </think>

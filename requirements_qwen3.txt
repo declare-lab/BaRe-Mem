@@ -1,0 +1,43 @@
+# The environment of every experiment: transformers 4.56.2 and vLLM 0.8.5 (the tilt patches its attention kernels).
+#
+#   pip install -r requirements_qwen3.txt
+#   (vLLM line: install separately with --no-deps, see note below)
+
+torch==2.6.0
+torchvision==0.21.0
+transformers==4.56.2
+huggingface-hub==0.35.3
+tokenizers==0.22.2
+numpy==1.26.4
+
+# --- model loading ---
+accelerate==1.13.0
+safetensors==0.7.0
+sentencepiece==0.2.1
+
+# --- inference (vLLM installed with --no-deps; deps pinned explicitly) ---
+# pip install vllm==0.8.5 --no-deps
+vllm==0.8.5
+xformers==0.0.29.post2
+triton==3.2.0
+ray==2.55.1
+outlines==0.1.11
+openai==2.24.0
+pyarrow==24.0.0
+
+# --- answer grading (no torch/transformers deps; safe to bump independently) ---
+math-verify==0.9.0
+latex2sympy2_extended==1.11.0
+antlr4-python3-runtime==4.13.2
+
+# --- utilities ---
+hjson==3.1.0
+einops==0.8.0
+pydantic==2.13.4
+tqdm
+ninja
+psutil
+py-cpuinfo
+msgpack
+packaging
+pytest

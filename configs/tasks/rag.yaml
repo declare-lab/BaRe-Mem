@@ -1,0 +1,6 @@
+# A task type. Reading (SQuAD): a short answer taken from the passage; right when its token-F1 against the gold answer or an alias is at least 0.5.
+grader: rag                         # the rule that extracts and verifies an answer (feedback_state/tasks.py, GRADERS)
+agreement: qa                       # when two answers are the same answer in a vote (feedback_state/answer_groups.py)
+context: true                       # the event's passage is shown with the question
+instruction: "Answer the question using the evidence. End with a line of the form 'Final answer: <short answer>'."
+max_tokens: 256                    # a peer's answer budget

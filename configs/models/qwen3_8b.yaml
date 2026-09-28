@@ -1,0 +1,4 @@
+# A frozen central model for the reader-against-peer comparison (thinking off, like Qwen3-4B).
+hf_id: Qwen/Qwen3-8B
+path: Qwen3-8B
+engine: vllm
