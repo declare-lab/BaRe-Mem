@@ -106,7 +106,7 @@ def build(cfg: dict, smoke: bool) -> str:
     else:
         base_streams = datasets
     rows = []   # (label, eval model key, record model, {base stream: evaluated stream}, layout for the record)
-    ref_cfg = deep_merge(cfg, {"record": {"fit": tb.get("reference_fit", "address_fit")}, "own_answer": False})
+    ref_cfg = deep_merge(cfg, {"record": {"fit": tb.get("reference_fit", "self")}, "own_answer": False})
     for m in tb.get("reference", []) if not smoke else []:
         rows.append((f"{m} (reference)", m, m, {s: s for s in base_streams}, Layout(ref_cfg, False)))
     if kind == "models":

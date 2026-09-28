@@ -1,4 +1,4 @@
-# The reference rows: frozen Qwen3-4B, its own record fit on address_fit, whole capability-supported and capability-challenging streams.
+# The reference rows: frozen Qwen3-4B, its own record, whole capability-supported and capability-challenging streams.
 base: ../base.yaml
 name: main
 steps: [features, record, evaluate, table]

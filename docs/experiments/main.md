@@ -5,14 +5,14 @@ bash run.sh configs/experiments/main.yaml --smoke     # 48 events, every step
 bash run.sh configs/experiments/main.yaml             # the whole capability-supported and capability-challenging streams
 ```
 
-Qwen3-4B is both the frozen judge whose hidden states address the record and the central model that answers. The record
-is fit on `address_fit` (PCA addresses, label-free) and run read-before-write along `capability_supported` and `capability_challenging` in the order
+Qwen3-4B is both the frozen judge whose hidden states address the record and the central model that answers. The record's
+PCA addresses are fit on each stream's own features (label-free), and it runs read-before-write along `capability_supported` and `capability_challenging` in the order
 `shuffled0`. The model answers every event in four conditions.
 
 | step | what runs | where it lands |
 |---|---|---|
-| features | `pipeline.features` on address_fit, capability_supported, capability_challenging | `outputs/features/q3_4b/<stream>/` |
-| record | `pipeline.record` per evaluated stream | `outputs/record/q3_4b/<stream>/shuffled0.fit-address_fit.jsonl` + `.quality.json` |
+| features | `pipeline.features` on capability_supported, capability_challenging | `outputs/features/q3_4b/<stream>/` |
+| record | `pipeline.record` per evaluated stream | `outputs/record/q3_4b/<stream>/shuffled0.fit-self.jsonl` + `.quality.json` |
 | evaluate | `pipeline.evaluate` per stream and condition, vLLM | `outputs/eval/q3_4b/<stream>/<condition>/` |
 | table | `pipeline.table` | `outputs/tables/main.md` |
 

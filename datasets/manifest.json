@@ -1,7 +1,7 @@
 {
  "version": 5,
  "date": "2026-09-14",
- "repo": "anonymous/bare-mem-peers",
+ "repo": "Sssunset/BaRe-Mem-Data",
  "files": [
   {
    "dataset": "capability_supported",
@@ -2034,33 +2034,6 @@
       "mean_chars_misleading": 235.03734833164813
      }
     }
-   }
-  },
-  {
-   "dataset": "address_fit",
-   "kind": "stream",
-   "file": "data/address_fit.jsonl.gz",
-   "unpacks_to": "data/address_fit/stream.jsonl",
-   "rows": 17709,
-   "bytes": 27002347,
-   "sha256": "3550e5b15826184bb04b202efcb1f412f4fb37271284474e107c786105a69c44",
-   "sources": {
-    "apps": 1736,
-    "gsm8k": 7473,
-    "squad": 8500
-   },
-   "task_types": {
-    "code": 1736,
-    "math": 7473,
-    "rag": 8500
-   },
-   "peers": {
-    "peer_0": "google/gemma-3-4b-it",
-    "peer_1": "microsoft/Phi-4-mini-instruct",
-    "peer_2": "Qwen/Qwen2.5-Coder-7B-Instruct",
-    "peer_3": "meta-llama/Llama-3.1-8B-Instruct",
-    "peer_4": "deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct",
-    "peer_5": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
    }
   }
  ]

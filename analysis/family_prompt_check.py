@@ -51,7 +51,7 @@ def check(model: str, rows: list[dict], records: dict, gamma: float) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--models", nargs="+", required=True)
-    ap.add_argument("--prompts", default="outputs/record/q3_4b/capability_supported/shuffled0.fit-address_fit.jsonl")
+    ap.add_argument("--prompts", default="outputs/record/q3_4b/capability_supported/shuffled0.fit-self.jsonl")
     ap.add_argument("--records", default="data/capability_supported/test.jsonl")
     ap.add_argument("--k", type=int, default=100)
     ap.add_argument("--gamma", type=float, default=3.0)

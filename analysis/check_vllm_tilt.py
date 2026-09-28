@@ -29,7 +29,7 @@ def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--stage", choices=["vllm", "hf"], required=True)
     p.add_argument("--central_model", required=True)
-    p.add_argument("--prompts", type=Path, default=Path("outputs/record/q3_4b/capability_supported/shuffled0.fit-address_fit.jsonl"))
+    p.add_argument("--prompts", type=Path, default=Path("outputs/record/q3_4b/capability_supported/shuffled0.fit-self.jsonl"))
     p.add_argument("--records", type=Path, default=Path("data/capability_supported/test.jsonl"))
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--n", type=int, default=16)

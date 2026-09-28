@@ -1,8 +1,8 @@
 # The datasets
 
 The pipeline starts from released datasets: the six-peer streams, every peer's verified misleading answers, and the
-misleading streams built from them. `manifest.json` lists every file with its sha256; `download.py` fetches them from a
-Hugging Face dataset repository (`repo` in `manifest.json`, or `--repo`), checks every file and unpacks it into `data/`, the
+misleading streams built from them. `manifest.json` lists every file with its sha256; `download.py` fetches them from the
+Hugging Face dataset repository [Sssunset/BaRe-Mem-Data](https://huggingface.co/datasets/Sssunset/BaRe-Mem-Data) (`repo` in `manifest.json`, or `--repo`), checks every file and unpacks it into `data/`, the
 layout the pipeline reads.
 
 ```bash
@@ -13,7 +13,6 @@ python datasets/download.py --repo <user>/<dataset>           # from another cop
 
 | dataset (configs/datasets/) | file in the release | goes to |
 |---|---|---|
-| `address_fit` | `data/address_fit.jsonl.gz` | `data/address_fit/stream.jsonl` (17,709 events: GSM8K, SQuAD, APPS; six peers; used label-free, to fit the record's addresses) |
 | `capability_supported` | `data/capability_supported.jsonl.gz` | `data/capability_supported/test.jsonl` (4,319 events: GSM8K test, SQuAD dev, APPS test with hidden tests) |
 | `capability_challenging` | `data/capability_challenging.jsonl.gz` | `data/capability_challenging/test.jsonl` (17,403 events: PIQA, MMLU, OpenBookQA, SciQ, BBH, SuperGLUE) |
 | `capability_supported_misleading`, `capability_challenging_misleading` | `answers/<dataset>.jsonl.gz` | `data/<dataset>/<peer>/`: every peer's misleading answer to every event |

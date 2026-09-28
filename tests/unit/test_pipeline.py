@@ -73,7 +73,6 @@ def test_registered_datasets_resolve_to_data_and_smoke_builds_are_isolated(tmp_p
     real, smoke = Layout(cfg), Layout(cfg, smoke=True)
 
     assert real.stream("capability_supported")["path"] == tmp_path / "data/capability_supported/test.jsonl"
-    assert real.stream("address_fit")["path"] == tmp_path / "data/address_fit/stream.jsonl"
     p050 = real.stream("capability_supported_misleading_p050")
     assert p050["path"] == tmp_path / "data/capability_supported_misleading_p050/test.jsonl"
     assert (p050["kind"], p050["base"], p050["answers"], p050["regime"], p050["peers"]) == ("misleading", "capability_supported", "capability_supported_misleading", "p050", 6)
@@ -89,9 +88,9 @@ def test_registered_datasets_resolve_to_data_and_smoke_builds_are_isolated(tmp_p
 
 def test_the_record_file_names_its_fit_and_any_non_default_setting(tmp_path):
     base = load(EXPERIMENTS / "main.yaml", [f"paths.outputs={tmp_path}"])
-    assert Layout(base).record_file("q3_4b", "capability_supported").name == "shuffled0.fit-address_fit.jsonl"
+    assert Layout(base).record_file("q3_4b", "capability_supported").name == "shuffled0.fit-self.jsonl"
     other = load(EXPERIMENTS / "main.yaml", [f"paths.outputs={tmp_path}", "record.dim=64"])
-    assert Layout(other).record_file("q3_4b", "capability_supported").name == "shuffled0.fit-address_fit.qc-d64-lam100.jsonl"
+    assert Layout(other).record_file("q3_4b", "capability_supported").name == "shuffled0.fit-self.qc-d64-lam100.jsonl"
 
 
 def test_main_expands_to_the_reference_pipeline(tmp_path):
@@ -99,10 +98,10 @@ def test_main_expands_to_the_reference_pipeline(tmp_path):
     plan = Plan(cfg, "main.yaml", smoke=False, gpus=[0, 1, 2, 3])
 
     feats = plan.features()
-    assert len(feats) == 3 * 4                                            # address_fit (fit) + capability_supported + capability_challenging, four shards each
+    assert len(feats) == 2 * 4                                            # capability_supported + capability_challenging, four shards each
     assert "--model /models/Qwen3-4B" in feats[0].cmd and "--shards 4 --shard 0" in feats[0].cmd
     rec = [j for j in plan.record() if j.name == "record_q3_4b_capability_supported"][0]
-    assert "--fit-features" in rec.cmd and "address_fit" in rec.cmd and "--dim 256 --lam 100.0" in rec.cmd
+    assert "--fit-features" not in rec.cmd and "--dim 256 --lam 100.0" in rec.cmd          # each stream fits its own addresses
     ev = {j.name: j for j in plan.evaluate()}
     assert len(ev) == 2 * 4
     assert "--mode peers --gamma 3.0 --bias-form logratio" in ev["eval_q3_4b_capability_supported_tilt"].cmd
@@ -228,7 +227,7 @@ def test_question_only_is_shared_by_a_stream_and_its_misleading_variants(tmp_pat
     stored = tmp_path / "out/eval/q3_4b/capability_supported/solo"
     stored.mkdir(parents=True)
     (stored / "eval_metrics.json").write_text(json.dumps({"mode": "solo", "gamma": 0.0, "swap_record": False, "max_new_tokens": 768,
-                                                          "record": "outputs/record/q3_4b/capability_supported/shuffled0.fit-address_fit.jsonl"}))
+                                                          "record": "outputs/record/q3_4b/capability_supported/shuffled0.fit-self.jsonl"}))
     assert ev["eval_q3_4b_capability_supported_solo"].check() is None                                     # the main experiment's result is reused
 
 
@@ -323,7 +322,7 @@ def test_combination_adds_the_own_answer_before_the_record_and_chooses_after_pee
             f"--question-alone {tmp_path}/out/eval/q3_4b/capability_supported/solo ") in comb.cmd
     assert "--prior 0.5,0.0 --lam 1.0" in comb.cmd and comb.gpus == 0
     with pytest.raises(SystemExit, match="fit: self"):
-        Plan(load(EXPERIMENTS / "combination.yaml", ["record.fit=address_fit"]), "combination.yaml", smoke=False, gpus=[0])
+        Plan(load(EXPERIMENTS / "combination.yaml", ["record.fit=capability_supported"]), "combination.yaml", smoke=False, gpus=[0])
 
 
 def test_a_combination_smoke_run_reads_the_released_stream_and_writes_to_smoke(tmp_path):

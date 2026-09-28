@@ -12,7 +12,6 @@ own_prob (pipeline.combination reads it). --save-addresses writes every event's 
 (a later analysis) can run the same record without the features or the PCA fit.
 
     PYTHONPATH=. python -m pipeline.record --stream data/capability_supported/test.jsonl --features outputs/features/q3_4b/capability_supported \
-        --fit-stream data/address_fit/stream.jsonl --fit-features outputs/features/q3_4b/address_fit \
         --order shuffled0 --out outputs/record/q3_4b/capability_supported/shuffled0.jsonl
 
 Writes <out> (one row per event: pos, id, task_type, source, peer_order, peer_correct, memory_prob, memory_evidence,

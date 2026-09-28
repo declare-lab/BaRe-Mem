@@ -27,7 +27,7 @@ record:                                    # pipeline.record
   dim: 256                                 # PCA components per part
   lam: 100.0                               # prior precision
   order: shuffled0                         # the stream order: numpy default_rng(0).permutation
-  fit: address_fit                              # where the PCA addresses are fit (label-free); "self" = each stream on its own
+  fit: self                                     # the PCA addresses are fit on each stream's own features (label-free)
 
 evaluation:                                # pipeline.evaluate
   engine: vllm
