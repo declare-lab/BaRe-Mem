@@ -1,8 +1,42 @@
 # The pipeline
 
-Reference for running and extending the code: the experiments, the stages behind `run.sh`, the registries, what an
-experiment file can set, where results go, and the implementation checks. Setup and the main commands are in the
+Reference for running and extending the code: how the method maps onto the code, the experiments, the stages behind
+`run.sh`, the registries, what an experiment file can set, where results go, and the implementation checks. Setup and the main commands are in the
 [README](../README.md).
+
+## The method in code
+
+**The record.** For event *t* and answer *k*, the frozen central model reads the question and the answers; its hidden
+states give an address `x_{t,k}`: a PCA projection of the question features placed in answer *k*'s block, a projection
+of the features of answer *k*, and a constant. The record is the exact posterior of a linear-Gaussian model of signed
+correctness `s ∈ {−1, +1}`:
+
+```
+Λ = λI + Σ x xᵀ,    b = Σ s x,    λ = 100
+read-out:   μ = xᵀ Λ⁻¹ b,   v = xᵀ Λ⁻¹ x,   p = Φ(μ / √(1 + v))
+```
+
+It runs along the stream **read before write**: the estimate `p_{t,k}` of every answer comes from earlier events only;
+then the model answers, and only then are the event's verified labels written in, one Sherman–Morrison update per
+answer. Every stream starts cold (`feedback_state/kalman_memory.py`, `pipeline/record.py`).
+
+**The attention tilt (Advisors + memory).** Every attention score onto a token of peer *k*'s answer gets
+`γ · log(p_k / max_j p_j)` added, with γ = 3, in every layer and head. The favourite peer is untouched, and nothing is
+tilted while the record is still flat. This is exact reweighting, `softmax(s + b) = Norm(A ⊙ c)` with
+`c_k = (p_k / max p)^γ`, so it applies to any softmax attention. It runs inside vLLM's attention kernels at engine
+speed (`feedback_state/vllm_attn_bias.py`; the HF reference is `feedback_state/attn_bias.py`).
+
+**Consult or answer alone (BaRe-Mem).** The record also estimates the central model's own no-consultation answer
+(`own_answer: true`, the seventh answer: recorded, never shown in the prompt). Per question, with `T` the record's top
+estimate among the peers and `κ` its estimate of the own answer, BaRe-Mem takes Advisors + memory when
+`T·ρ + (1 − T)(κ − δ) ≥ κ` and the no-consultation answer otherwise; the reading line (ρ, δ) of each task type is learned
+online from earlier questions (`feedback_state/reading_line.py`, `pipeline/combination.py`).
+
+**Feedback protocol.** After every question the verified labels of all answers are written into the record (the six
+peers and the model's own answer), whichever branch was chosen, and whether Advisors + memory was right is written into
+the reading line. Both branches are therefore generated and verified for every question. `pipeline.record
+--feedback-ratio r` keeps only a share r of the events' labels (sparse feedback). The lead-worker team
+(`agent_team`) uses a different protocol, described in `docs/experiments/agent_team.md`.
 
 ## Experiments
 
