@@ -245,13 +245,10 @@ Datasets, models, peers and task types are registered one YAML file each, and ex
 If you find our work useful, please kindly cite:
 
 ```bibtex
-@misc{feng2026baremembayesianreliabilitymemory,
-      title={BaRe-Mem: Bayesian Reliability Memory for Robust and Adaptive Agent Consultation},
-      author={Peilin Feng and Zhengyang Huang and Soujanya Poria},
-      year={2026},
-      eprint={2609.35551},
-      archivePrefix={arXiv},
-      primaryClass={cs.AI},
-      url={https://arxiv.org/abs/2609.35551},
+@article{feng2026bare,
+  title={BaRe-Mem: Bayesian Reliability Memory for Robust and Adaptive Agent Consultation},
+  author={Feng, Peilin and Huang, Zhengyang and Poria, Soujanya},
+  journal={arXiv preprint arXiv:2609.35551},
+  year={2026}
 }
 ```
